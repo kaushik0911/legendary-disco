@@ -61,8 +61,7 @@ my_data_analysis_function = function(dataset, outlier_method="IQR") {
       break
     }
     
-    outlier_results[[column_name]] = (
-      outliers = outliers
+    outlier_results[[column_name]] = outliers
     )
   }
 
