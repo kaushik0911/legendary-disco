@@ -1,9 +1,12 @@
+# install.packages("DescTools")
+# install.packages("shiny")
+library(DescTools)
+library(shiny)
+
 # TODO
 # 1. dentify qualitative and quantitative variables in the dataset.
 #   * sapply function not getting correct output
 
-
-# assumption that categorical data should be in factor format.
 my_data_analysis_function = function(dataset, outlier_method="IQR") {
   # Task 3.1
   # Identify qualitative and quantitative variables in the dataset.
@@ -52,8 +55,6 @@ my_data_analysis_function = function(dataset, outlier_method="IQR") {
 
   print(missing_counts)
 
-  # install.packages("DescTools")
-  library(DescTools)
   for(column_name in qualitative_variables) {
     dataset[[column_name]][is.na(dataset[[column_name]])] =
       Mode(dataset[[column_name]], na.rm = FALSE)
@@ -89,7 +90,8 @@ my_data_analysis_function = function(dataset, outlier_method="IQR") {
   }
   
   layout(matrix(1:cell_count, ncol = 2, byrow = TRUE))
-  par(mar = c(3, 3, 2, 1))  # Reduce margins
+
+  par(mar = c(3, 3, 2, 1))
 
   for(column_name in quantitative_variables) {
     column_data = dataset[[column_name]]
@@ -98,12 +100,19 @@ my_data_analysis_function = function(dataset, outlier_method="IQR") {
   }
   
   layout(matrix(1:cell_count, ncol = 2, byrow = TRUE))
-  par(mar = c(3, 3, 2, 1))  # Reduce margins
+  par(mar = c(3, 3, 2, 1))
   
   for(column_name in qualitative_variables) {
     column_data = dataset[[column_name]]
-    attribute_count = table(column_data)
-    barplot(attribute_count, main = paste("Bar chart of", column_name))
+    attribute_count = sort(table(column_data), decreasing = TRUE)
+    
+    bar_colors = terrain.colors(length(names(attribute_count)))
+    
+    barplot(
+      attribute_count,
+      main = paste("Bar chart of", column_name),
+      col = bar_colors
+    )
   }
 
   # Task 3.5
@@ -117,4 +126,67 @@ my_data_analysis_function = function(dataset, outlier_method="IQR") {
 bank_data = read.csv("Bank Churn Data CMM703.csv", header = TRUE)
 my_data_analysis_function(bank_data)
 
+
+app_ui = fluidPage(
+  titlePanel("My Data Analysis APP"),
+  sidebarLayout(
+    sidebarPanel(
+      fileInput("file", "Upload CSV File (Only one CSV file)", accept = c(".csv")),
+      selectInput(
+        "outlier_method", "Outlier Detection Method",
+        choices = c("IQR", "Z-score"),
+        selected = "IQR"),
+      actionButton(
+        "process", "Process Data")
+    ),
+    mainPanel(
+      verbatimTextOutput("summary"),
+      renderUI("plot_ui")
+    )
+  )
+)
+
+app_server = function(input, output) {
+  csv_dataset = reactive({
+    req(input$file)
+    read.csv(input$file$datapath, stringsAsFactors = TRUE)
+  })
+
+  processed_data = eventReactive(
+    input$process, {
+      my_data_analysis_function(
+        csv_dataset(), outlier_method = input$outlier_method)
+    }
+  )
+
+  output$summary = renderPrint({
+    req(processed_data())
+    list(
+      "Missing Values" = processed_data()$missing_counts,
+      "Outliers" = processed_data()$outlier_indices
+    )
+  })
+
+  output$plot_ui <- renderUI({
+    req(processed_data())
+    plot_output_list <- lapply(names(processed_data()$plots), function(name) {
+      plotOutput(outputId = paste0("plot_", name))
+    })
+    do.call(tagList, plot_output_list)
+  })
+  
+  observe({
+    req(processed_data())
+    for (name in names(processed_data()$plots)) {
+      local({
+        plot_name <- name
+        output[[paste0("plot_", plot_name)]] <- renderPlot({
+          processed_data()$plots[[plot_name]]
+        })
+      })
+    }
+  })
+}
+
+shinyApp(ui = app_ui, server = app_server)
 
