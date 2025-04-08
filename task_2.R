@@ -125,3 +125,4 @@ for(feature in featureset) {
   generate_bar(feature, stayed_customers)
 }
 
+
