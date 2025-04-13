@@ -52,7 +52,7 @@ text(
 
 abline(h = 50, col = "blue", lty = 2)  # red dashed line at 50%
 
-# Chart 2
+# chart 2
 
 candy_data$candy_type = "other"
 candy_data$candy_type[candy_data$crispedricewafer == 1] = "crispedricewafer"
@@ -84,7 +84,7 @@ mtext(
   "Each circle size shows the unit price percentile compared to the rest of the set",
   side = 3,
   line = 0.5,
-  cex = 0.9
+  cex  = 0.9
 )
 
 points(
@@ -92,16 +92,16 @@ points(
   y = candy_data$winpercent,
   cex = candy_price_sizes,
   pch = 21,
-  bg = scatter_colors,
+  bg  = scatter_colors,
   col = "black"
 )
 
 legend(
   "topleft",
   legend = c("crispedricewafer", "peanutyalmondy", "bar", "other"),
-  pt.bg = scatter_colors, 
-  col = "black",
-  pch = 21,
+  pt.bg  = scatter_colors, 
+  col    = "black",
+  pch    = 21,
   pt.cex = 2,
-  horiz = TRUE,
+  horiz  = TRUE,
 )
