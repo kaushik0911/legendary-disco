@@ -1,33 +1,3 @@
 library(shiny)
-library(ggplot2)
 
-ui <- page_sidebar(
-  title = "Example dashboard",
-  sidebar = sidebar(
-    varSelectInput("var", "Select variable", mtcars)
-  ),
-  div(
-    uiOutput(
-      layout_columns(
-        card(
-          full_screen = TRUE,
-          card_header("My plot"),
-          plotOutput("p")
-        ),
-        card(
-          full_screen = TRUE,
-          card_header("My plot"),
-          plotOutput("p")
-        )
-      )
-    )
-  )
-)
-
-server <- function(input, output) {
-  output$p <- renderPlot({
-    ggplot(mtcars) + geom_histogram(aes(!!input$var))
-  })
-}
-
-shinyApp(ui, server)
+runExample("01_hello")

@@ -118,7 +118,6 @@ for(feature in featureset) {
 }
 
 # qualitative variables
-
 featureset = c("Geography", "Gender", "NumOfProducts", "HasCrCard", "IsActiveMember")
 
 plot_bargraph = function (param_feature, param_bank_data, param_title) {
@@ -146,6 +145,16 @@ for(feature in featureset) {
   plot_bargraph(feature, stayed_customers, "(Stayed Customers)")
 }
 
+
+featureset = c("Age", "CreditScore", "Balance", "EstimatedSalary", "Tenure")
+# correlation analysis
+correlation_matrix = cor(bank_data[featureset])
+print(correlation_matrix)
+
+# visualize correlation in a heatmap
+heatmap(correlation_matrix,
+        main = "Correlation Heatmap")
+
 exited_customers = NULL
 stayed_customers = NULL
 
@@ -153,7 +162,6 @@ stayed_customers = NULL
 # y == "churn status", YES or NO, Qualitative Variable and Binary
 # x == (other fields)
 # model should be binary logistic regression model
-
 
 counts = table(bank_data$Exited)
 print(counts)
@@ -219,7 +227,7 @@ mean(test_dataset$predicted_class == test_dataset$Exited)
 # install.packages("modEvA")
 library(modEvA)
 
-hoslem_results <- HLfit(
+hoslem_results = HLfit(
   model = refined_bank_model,
   bin.method = "n.bins",
   n.bins = 10,
@@ -237,5 +245,29 @@ print(hoslem_results)
 # that means a potential lack of fit.
 
 # what is the next step then,
-# * we can change the weights meaning 'glm' function support 'weights' as a parameter.
-# * we can give priority to the 'Yes' and redo the modeling.
+# * we can do a cross validation by splitting the dataset into sevaral gorups and redo the process
+# * Also can change the weights meaning 'glm' function support 'weights' as a parameter.
+#   Because there is a parameter called 'weight' that can give priority to the 'Yes' and redo the modeling.
+
+# lets start create a model to check customer 'Tenure'
+
+# lets check 'Tenure' frequency
+table(bank_data$Tenure)
+
+# 'Tenure' is recorded in whole years from 0 to 10, satisfying Poisson's integer requirement.
+# no negative values
+# if you look at Tenure == 10 it is skewed to right, but not severely imbalanced.
+
+boxplot(bank_data$Tenure, horizontal = TRUE)
+# mean and median almost equals to 5 years and no extreme outliers.
+
+mean(bank_data$Tenure)
+var(bank_data$Tenure)
+
+# here poisson assumption (variance = mean) is violated.
+# then use the negative binomial regression
+library(MASS)
+nb_model = glm.nb(Tenure ~ ., data = bank_data)
+summary(nb_model)
+
+# in the output the significants are 'HasCrCardYes' and 'IsActiveMemberYes', both are binary values meaning 'Yes' or 'No' therefore the model is not adequate to predict the 'Tenure' because the output will be 4, (YES-YES, NO-NO, YES-NO, NO-YES)
