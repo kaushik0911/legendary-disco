@@ -17,8 +17,7 @@ app_ui = page_sidebar(
     textInput( 
       "response_variable", 
       "Response Variable", 
-      placeholder = "Enter Name",
-      value = "HasCrCard"
+      placeholder = "Enter Variable Name"
     ),
     actionButton("action", label = "Start Process")
   ),
@@ -45,7 +44,7 @@ app_server = function(input, output) {
   
     dataset = read.csv(uploaded_file$datapath, header = TRUE)
     
-    output$dataset_head = renderTable(head(bank_data), striped = TRUE) 
+    output$dataset_head = renderTable(head(dataset), striped = TRUE) 
   
     number_of_rows     = nrow(dataset)
     found_index_column = FALSE

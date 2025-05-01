@@ -153,7 +153,9 @@ print(correlation_matrix)
 
 # visualize correlation in a heatmap
 heatmap(correlation_matrix,
-        main = "Correlation Heatmap")
+        main = "Correlation Heatmap",
+        col = heat.colors(256),
+        scale = "none")
 
 exited_customers = NULL
 stayed_customers = NULL
