@@ -1,4 +1,4 @@
-candy_data = read.csv("CMM703 Candy Data 2024-2025.csv", header = TRUE)
+candy_data = read.csv(file.path("01_data", "candy-2024-2025.csv"), header = TRUE)
 
 # these are the candy ingredients
 ingredients = c("chocolate", "fruity", "caramel", "peanutyalmondy", "nougat", "crispedricewafer", "hard", "bar", "pluribus")
