@@ -5,9 +5,9 @@ ingredients = c("chocolate", "fruity", "caramel", "peanutyalmondy", "nougat", "c
 
 # lets analysis favorite candy ingredient
 feature_average = data.frame(
-                    feature_name = character(),
-                    average_win_percentage = numeric()
-                  )
+      feature_name = character(),
+      average_win_percentage = numeric()
+    )
 
 for (ingredient in ingredients) {
   has_feature     = candy_data[candy_data[[ingredient]] == 1, ]
